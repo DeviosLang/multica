@@ -13,6 +13,7 @@ import { useAuthStore } from "@multica/core/auth";
 import { useWorkspaceId } from "@multica/core/hooks";
 import { useWorkspacePaths } from "@multica/core/paths";
 import { useModalStore } from "@multica/core/modals";
+import { copyToClipboard } from "@multica/core/utils";
 import { useUpdateIssue } from "@multica/core/issues/mutations";
 import {
   memberListOptions,
@@ -123,10 +124,10 @@ export function useIssueActions(issue: Issue | null): UseIssueActionsResult {
       : typeof window !== "undefined"
         ? window.location.origin + path
         : path;
-    try {
-      await navigator.clipboard.writeText(url);
+    const success = await copyToClipboard(url);
+    if (success) {
       toast.success("Link copied");
-    } catch {
+    } else {
       toast.error("Failed to copy link");
     }
   }, [paths, issueId, navigation]);

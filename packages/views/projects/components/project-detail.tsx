@@ -22,6 +22,7 @@ import { PROJECT_STATUS_ORDER, PROJECT_STATUS_CONFIG, PROJECT_PRIORITY_ORDER, PR
 import { BOARD_STATUSES } from "@multica/core/issues/config";
 import { createIssueViewStore } from "@multica/core/issues/stores/view-store";
 import { ViewStoreProvider, useViewStore } from "@multica/core/issues/stores/view-store-context";
+import { copyToClipboard } from "@multica/core/utils";
 import { filterIssues } from "../../issues/utils/filter";
 import { getProjectIssueMetrics } from "./project-issue-metrics";
 import { ActorAvatar } from "../../common/actor-avatar";
@@ -534,9 +535,13 @@ export function ProjectDetail({ projectId }: { projectId: string }) {
                   }
                 />
                 <DropdownMenuContent align="end" className="w-auto">
-                  <DropdownMenuItem onClick={() => {
-                    navigator.clipboard.writeText(window.location.href);
-                    toast.success("Link copied");
+                  <DropdownMenuItem onClick={async () => {
+                    const success = await copyToClipboard(window.location.href);
+                    if (success) {
+                      toast.success("Link copied");
+                    } else {
+                      toast.error("Failed to copy link");
+                    }
                   }}>
                     <Link2 className="h-3.5 w-3.5" />
                     Copy link

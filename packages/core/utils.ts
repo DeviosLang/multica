@@ -48,3 +48,42 @@ export function createSafeId(): string {
 export function createRequestId(length = 8): string {
   return createSafeId().replace(/-/g, "").slice(0, length);
 }
+
+/**
+ * Copy text to the clipboard.
+ *
+ * Uses the modern Clipboard API when available (requires HTTPS or localhost).
+ * Falls back to the legacy execCommand approach so HTTP deployments still work.
+ *
+ * Returns true on success, false on failure.
+ */
+export async function copyToClipboard(text: string): Promise<boolean> {
+  // Modern Clipboard API (HTTPS / localhost only)
+  if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      // Fall through to legacy approach
+    }
+  }
+
+  // Legacy execCommand fallback (works over HTTP)
+  if (typeof document !== "undefined") {
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      const success = document.execCommand("copy");
+      document.body.removeChild(textarea);
+      return success;
+    } catch {
+      return false;
+    }
+  }
+
+  return false;
+}
