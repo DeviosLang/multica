@@ -93,6 +93,13 @@ func LoadConfig(overrides Overrides) (Config, error) {
 			Model: strings.TrimSpace(os.Getenv("MULTICA_CODEX_MODEL")),
 		}
 	}
+	codebuddyPath := envOrDefault("MULTICA_CODEBUDDY_PATH", "codebuddy")
+	if _, err := exec.LookPath(codebuddyPath); err == nil {
+		agents["codebuddy"] = AgentEntry{
+			Path:  codebuddyPath,
+			Model: strings.TrimSpace(os.Getenv("MULTICA_CODEBUDDY_MODEL")),
+		}
+	}
 	opencodePath := envOrDefault("MULTICA_OPENCODE_PATH", "opencode")
 	if _, err := exec.LookPath(opencodePath); err == nil {
 		agents["opencode"] = AgentEntry{
@@ -150,7 +157,7 @@ func LoadConfig(overrides Overrides) (Config, error) {
 		}
 	}
 	if len(agents) == 0 {
-		return Config{}, fmt.Errorf("no agent CLI found: install claude, codex, copilot, opencode, openclaw, hermes, gemini, pi, cursor-agent, or kimi and ensure it is on PATH")
+		return Config{}, fmt.Errorf("no agent CLI found: install claude, codebuddy, codex, copilot, opencode, openclaw, hermes, gemini, pi, cursor-agent, or kimi and ensure it is on PATH")
 	}
 
 	// Host info

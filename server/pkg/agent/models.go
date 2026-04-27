@@ -57,6 +57,8 @@ func ListModels(ctx context.Context, providerType, executablePath string) ([]Mod
 	switch providerType {
 	case "claude":
 		return claudeStaticModels(), nil
+	case "codebuddy":
+		return codebuddyStaticModels(), nil
 	case "codex":
 		return codexStaticModels(), nil
 	case "gemini":
@@ -91,7 +93,6 @@ func ListModels(ctx context.Context, providerType, executablePath string) ([]Mod
 		return nil, fmt.Errorf("unknown agent type: %q", providerType)
 	}
 }
-
 // ModelSelectionSupported reports whether setting `agent.model` has
 // any effect for the given provider. Today every provider in the
 // registry honours `opts.Model` end-to-end: Hermes routes it through
@@ -130,8 +131,33 @@ func cachedDiscovery(key string, fn func() ([]Model, error)) ([]Model, error) {
 
 // ── Static catalogs ──
 
-// claudeStaticModels reflects the Claude Code CLI's accepted --model
-// values. Keep this list short and current; stale entries here
+// codebuddyStaticModels returns the models supported by CodeBuddy Code
+// (Tencent's internal build). The list mirrors the --model values shown
+// in `codebuddy --help`. Default = claude-sonnet-4.6 to match the
+// upstream Claude Code default.
+func codebuddyStaticModels() []Model {
+	return []Model{
+		{ID: "claude-sonnet-4.6", Label: "Claude Sonnet 4.6", Provider: "anthropic", Default: true},
+		{ID: "claude-sonnet-4.6-1m", Label: "Claude Sonnet 4.6 (1M)", Provider: "anthropic"},
+		{ID: "claude-4.5", Label: "Claude 4.5", Provider: "anthropic"},
+		{ID: "claude-opus-4.7", Label: "Claude Opus 4.7", Provider: "anthropic"},
+		{ID: "claude-opus-4.7-1m", Label: "Claude Opus 4.7 (1M)", Provider: "anthropic"},
+		{ID: "claude-opus-4.6", Label: "Claude Opus 4.6", Provider: "anthropic"},
+		{ID: "claude-opus-4.6-1m", Label: "Claude Opus 4.6 (1M)", Provider: "anthropic"},
+		{ID: "claude-haiku-4.5", Label: "Claude Haiku 4.5", Provider: "anthropic"},
+		{ID: "gemini-3.1-pro", Label: "Gemini 3.1 Pro", Provider: "google"},
+		{ID: "gemini-3.0-flash", Label: "Gemini 3.0 Flash", Provider: "google"},
+		{ID: "gemini-2.5-pro", Label: "Gemini 2.5 Pro", Provider: "google"},
+		{ID: "gpt-5.4", Label: "GPT-5.4", Provider: "openai"},
+		{ID: "gpt-5.2", Label: "GPT-5.2", Provider: "openai"},
+		{ID: "gpt-5.3-codex", Label: "GPT-5.3 Codex", Provider: "openai"},
+		{ID: "glm-5.1-ioa", Label: "GLM-5.1 (IOA)", Provider: "zhipu"},
+		{ID: "kimi-k2.6-ioa", Label: "Kimi K2.6 (IOA)", Provider: "moonshot"},
+		{ID: "deepseek-v3-2-volc-ioa", Label: "DeepSeek V3.2 (IOA)", Provider: "deepseek"},
+	}
+}
+
+// claudeStaticModels reflects the Claude Code CLI's accepted --model// values. Keep this list short and current; stale entries here
 // mislead users more than they help. Default = Sonnet because it's
 // the everyday workhorse (Opus is reserved for advisor-style flows).
 func claudeStaticModels() []Model {
