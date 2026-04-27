@@ -202,6 +202,7 @@ export function CreateIssueModal({ onClose, data }: { onClose: () => void; data?
       open
       onOpenChange={(v) => {
         if (!v) {
+          clearDraft();
           setBacklogHintIssueId(null);
           onClose();
         }
